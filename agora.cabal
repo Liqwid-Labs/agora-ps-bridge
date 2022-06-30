@@ -171,33 +171,6 @@ library pprelude
     , base
     , plutarch
 
-executable agora-scripts
-  import:         lang, deps, exe-opts
-  main-is:        Main.hs
-  hs-source-dirs: agora-scripts
-  other-modules:
-    Codec.Serialise.Orphans
-    Data.Cache.Cached
-    ScriptExport.API
-    ScriptExport.Options
-    ScriptExport.Types
-
-  build-depends:
-    , agora
-    , cache
-    , clock
-    , containers
-    , gitrev
-    , hashable
-    , http-types
-    , optparse-applicative
-    , prettyprinter
-    , servant
-    , servant-server
-    , wai
-    , wai-cors
-    , warp
-
 executable agora-purescript-bridge
   import:         lang, deps, exe-opts
   main-is:        Bridge.hs
