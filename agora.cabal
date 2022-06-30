@@ -171,14 +171,6 @@ library pprelude
     , base
     , plutarch
 
-library agora-testlib
-  import:          lang, deps, test-deps
-  exposed-modules:
-    Test.Specification
-    Test.Util
-
-  hs-source-dirs:  agora-testlib
-
 executable agora-scripts
   import:         lang, deps, exe-opts
   main-is:        Main.hs
