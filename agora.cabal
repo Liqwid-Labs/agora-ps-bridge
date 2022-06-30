@@ -1,0 +1,274 @@
+cabal-version:      3.0
+name:               agora
+version:            0.1.0
+extra-source-files: CHANGELOG.md
+author:             Emily Martins <emi@haskell.fyi>
+license:            Apache-2.0
+
+--------------------------------------------------------------------------------
+-- Common Stanza Declarations
+
+-- Language options, warnings, some options for plutus
+
+common lang
+  ghc-options:
+    -Werror -Wall -Wcompat -Wincomplete-uni-patterns
+    -Wno-unused-do-bind -Wno-partial-type-signatures
+    -Wmissing-export-lists -Wincomplete-record-updates
+    -Wmissing-deriving-strategies -Wno-name-shadowing -Wunused-foralls
+    -fprint-explicit-foralls -fprint-explicit-kinds
+
+  mixins:
+    base hiding (Prelude),
+    pprelude (PPrelude as Prelude)
+
+  default-extensions:
+    NoStarIsType
+    BangPatterns
+    BinaryLiterals
+    ConstrainedClassMethods
+    ConstraintKinds
+    DataKinds
+    DeriveAnyClass
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    DerivingStrategies
+    DerivingVia
+    DoAndIfThenElse
+    DuplicateRecordFields
+    EmptyCase
+    EmptyDataDecls
+    EmptyDataDeriving
+    ExistentialQuantification
+    ExplicitForAll
+    FlexibleContexts
+    FlexibleInstances
+    ForeignFunctionInterface
+    GADTSyntax
+    GeneralisedNewtypeDeriving
+    HexFloatLiterals
+    ImplicitPrelude
+    ImportQualifiedPost
+    InstanceSigs
+    KindSignatures
+    LambdaCase
+    MonomorphismRestriction
+    MultiParamTypeClasses
+    NamedFieldPuns
+    NamedWildCards
+    NumericUnderscores
+    OverloadedLabels
+    OverloadedStrings
+    PackageImports
+    PartialTypeSignatures
+    PatternGuards
+    PolyKinds
+    PostfixOperators
+    QualifiedDo
+    RankNTypes
+    RelaxedPolyRec
+    ScopedTypeVariables
+    StandaloneDeriving
+    StandaloneKindSignatures
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    TypeSynonymInstances
+    UndecidableInstances
+    ViewPatterns
+    OverloadedRecordDot
+
+  default-language:   Haskell2010
+
+common deps
+  build-depends:
+    , aeson
+    , ansi-terminal
+    , base                   >=4.14 && <5
+    , base-compat
+    , base16
+    , bytestring
+    , cardano-binary
+    , cardano-prelude
+    , containers
+    , data-default
+    , data-default-class
+    , generics-sop
+    , liqwid-plutarch-extra
+    , plutarch
+    , plutarch-numeric
+    , plutarch-safe-money
+    , plutus-core
+    , plutus-ledger-api
+    , plutus-tx
+    , pprelude
+    , prettyprinter
+    , recursion-schemes
+    , serialise
+    , tagged
+    , template-haskell
+    , text
+
+  mixins:
+
+common test-deps
+  build-depends:
+    , agora
+    , cryptonite
+    , data-default-class
+    , memory
+    , mtl
+    , plutarch-context-builder
+    , plutarch-quickcheck
+    , QuickCheck
+    , quickcheck-instances
+    , tasty
+    , tasty-hedgehog
+    , tasty-hunit
+    , tasty-quickcheck
+    , universe
+    , universe-base
+
+common exe-opts
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -O0
+
+library
+  import:          lang, deps
+  exposed-modules:
+    Agora.Aeson.Orphans
+    Agora.AuthorityToken
+    Agora.Effect
+    Agora.Effect.GovernorMutation
+    Agora.Effect.NoOp
+    Agora.Effect.TreasuryWithdrawal
+    Agora.Governor
+    Agora.Governor.Scripts
+    Agora.MultiSig
+    Agora.Plutarch.Orphans
+    Agora.Proposal
+    Agora.Proposal.Scripts
+    Agora.Proposal.Time
+    Agora.SafeMoney
+    Agora.ScriptInfo
+    Agora.Stake
+    Agora.Stake.Scripts
+    Agora.Treasury
+    Agora.Utils
+
+  other-modules:
+  hs-source-dirs:  agora
+
+library pprelude
+  default-language: Haskell2010
+  exposed-modules:  PPrelude
+  hs-source-dirs:   agora
+  build-depends:
+    , base
+    , plutarch
+
+library agora-testlib
+  import:          lang, deps, test-deps
+  exposed-modules:
+    Test.Specification
+    Test.Util
+
+  hs-source-dirs:  agora-testlib
+
+library agora-specs
+  import:          lang, deps, test-deps
+  exposed-modules:
+    Property.Generator
+    Property.Governor
+    Property.MultiSig
+    Sample.Effect.GovernorMutation
+    Sample.Effect.TreasuryWithdrawal
+    Sample.Governor
+    Sample.Proposal
+    Sample.Proposal.Shared
+    Sample.Proposal.UnlockStake
+    Sample.Shared
+    Sample.Stake
+    Sample.Treasury
+    Spec.AuthorityToken
+    Spec.Effect.GovernorMutation
+    Spec.Effect.TreasuryWithdrawal
+    Spec.Governor
+    Spec.Proposal
+    Spec.Stake
+    Spec.Treasury
+    Spec.Utils
+
+  hs-source-dirs:  agora-specs
+  build-depends:   agora-testlib
+
+test-suite agora-test
+  import:         lang, deps, test-deps
+  type:           exitcode-stdio-1.0
+  main-is:        Spec.hs
+  hs-source-dirs: agora-test
+  build-depends:
+    , agora-specs
+    , agora-testlib
+
+benchmark agora-bench
+  import:         lang, deps
+  hs-source-dirs: agora-bench
+  main-is:        Main.hs
+  other-modules:
+    Bench
+    Options
+
+  type:           exitcode-stdio-1.0
+  build-depends:
+    , agora
+    , agora-specs
+    , agora-testlib
+    , cassava
+    , mtl
+    , optparse-applicative
+
+executable agora-scripts
+  import:         lang, deps, exe-opts
+  main-is:        Main.hs
+  hs-source-dirs: agora-scripts
+  other-modules:
+    Codec.Serialise.Orphans
+    Data.Cache.Cached
+    ScriptExport.API
+    ScriptExport.Options
+    ScriptExport.Types
+
+  build-depends:
+    , agora
+    , cache
+    , clock
+    , containers
+    , gitrev
+    , hashable
+    , http-types
+    , optparse-applicative
+    , prettyprinter
+    , servant
+    , servant-server
+    , wai
+    , wai-cors
+    , warp
+
+executable agora-purescript-bridge
+  import:         lang, deps, exe-opts
+  main-is:        Bridge.hs
+  hs-source-dirs: agora-purescript-bridge
+  other-modules:
+    AgoraTypes
+    Options
+
+  build-depends:
+    , agora
+    , optparse-applicative
+    , path
+    , purescript-bridge
