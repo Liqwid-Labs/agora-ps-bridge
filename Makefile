@@ -3,7 +3,7 @@ SHELL := /bin/sh
 
 .PHONY: hoogle format haddock usage tag format_nix format_haskell format_check lint ps_bridge bench bench_check scripts
 
-AGORA_TARGETS := agora agora-bench agora-purescript-bridge agora-scripts agora-specs agora-test agora-testlib
+AGORA_TARGETS := src
 
 usage:
 	@echo "usage: make <command> [OPTIONS]"
@@ -53,9 +53,10 @@ tag:
 lint:
 	hlint $(AGORA_TARGETS)
 
-PS_BRIDGE_OUTPUT_DIR := agora-purescript-bridge/
+PS_BRIDGE_OUTPUT_DIR := out/
+
 ps_bridge:
-	cabal run exe:agora-purescript-bridge -- -o $(PS_BRIDGE_OUTPUT_DIR)
+	cabal run exe:ps-bridge -- -o $(PS_BRIDGE_OUTPUT_DIR)
 
 bench:
 	cabal run agora-bench

@@ -112,10 +112,10 @@ common deps
 common exe-opts
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -O0
 
-executable agora-purescript-bridge
+executable ps-bridge
   import:         lang, deps, exe-opts
   main-is:        Bridge.hs
-  hs-source-dirs: agora-purescript-bridge
+  hs-source-dirs: src/
   other-modules:
     AgoraTypes
     Options
