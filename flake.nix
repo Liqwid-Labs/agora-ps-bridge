@@ -24,7 +24,7 @@
     "github:Liqwid-Labs/plutarch-safe-money?rev=9f968b80189c7e4b335527cd5b103dc26952f667";
   inputs.agora.url =
     "github:Liqwid-Labs/agora?rev=1533da68ecff75f2ee2fd68d023d269c17997fb2";
-  # inputs.ps-bridge.url = "https://github.com/mlabs-haskell/purescript-bridge";
+  inputs.ps-bridge.url = "https://github.com/mlabs-haskell/purescript-bridge";
 
   # Testing
   inputs.plutarch-quickcheck.url =
@@ -32,12 +32,10 @@
   inputs.plutarch-context-builder.url =
     "github:Liqwid-Labs/plutarch-context-builder?ref=staging";
 
-  outputs =
-    inputs@{ self, nixpkgs, nixpkgs-latest, haskell-nix, plutarch, ... }:
+  outputs = inputs@{ self, nixpkgs, flake-utils, nixpkgs-latest, haskell-nix
+    , plutarch, ... }:
     let
-      supportedSystems = nixpkgs-latest.lib.systems.flakeExposed;
-
-      perSystem = nixpkgs.lib.genAttrs supportedSystems;
+      perSystem = flake-utils.lib.eachSystem [ "x86_64-linux" ];
 
       pkgsFor = system:
         import nixpkgs {
@@ -125,56 +123,52 @@
 
       myhackage = system: compiler-nix-name:
         plutarch.inputs.haskell-nix-extra-hackage.mkHackageFor system
-          compiler-nix-name
-          ([
-            "${inputs.plutarch.inputs.flat}"
-            "${inputs.plutarch.inputs.protolude}"
-            "${inputs.plutarch.inputs.cardano-prelude}/cardano-prelude"
-            "${inputs.plutarch.inputs.cardano-crypto}"
-            "${inputs.plutarch.inputs.cardano-base}/binary"
-            "${inputs.plutarch.inputs.cardano-base}/cardano-crypto-class"
-            "${inputs.plutarch.inputs.plutus}/plutus-core"
-            "${inputs.plutarch.inputs.plutus}/plutus-ledger-api"
-            "${inputs.plutarch.inputs.plutus}/plutus-tx"
-            "${inputs.plutarch.inputs.plutus}/prettyprinter-configurable"
-            "${inputs.plutarch.inputs.plutus}/word-array"
-            "${inputs.plutarch.inputs.secp256k1-haskell}"
-            "${inputs.plutarch.inputs.plutus}/plutus-tx-plugin" # necessary for FFI tests
+        compiler-nix-name ([
+          "${inputs.plutarch.inputs.flat}"
+          "${inputs.plutarch.inputs.protolude}"
+          "${inputs.plutarch.inputs.cardano-prelude}/cardano-prelude"
+          "${inputs.plutarch.inputs.cardano-crypto}"
+          "${inputs.plutarch.inputs.cardano-base}/binary"
+          "${inputs.plutarch.inputs.cardano-base}/cardano-crypto-class"
+          "${inputs.plutarch.inputs.plutus}/plutus-core"
+          "${inputs.plutarch.inputs.plutus}/plutus-ledger-api"
+          "${inputs.plutarch.inputs.plutus}/plutus-tx"
+          "${inputs.plutarch.inputs.plutus}/prettyprinter-configurable"
+          "${inputs.plutarch.inputs.plutus}/word-array"
+          "${inputs.plutarch.inputs.secp256k1-haskell}"
+          "${inputs.plutarch.inputs.plutus}/plutus-tx-plugin" # necessary for FFI tests
 
-            # # Custom deps as a consumer
-            "${inputs.plutarch}"
-            "${inputs.plutarch}/plutarch-extra"
-            "${inputs.liqwid-plutarch-extra}"
-            "${inputs.agora}"
-            "${inputs.plutarch-numeric}"
-            "${inputs.plutarch-safe-money}"
-            "${inputs.plutarch-quickcheck}"
-            "${inputs.plutarch-context-builder}"
-            # "${inputs.ps-bridge}"
-          ]);
+          # # Custom deps as a consumer
+          "${inputs.plutarch}"
+          "${inputs.plutarch}/plutarch-extra"
+          "${inputs.liqwid-plutarch-extra}"
+          "${inputs.agora}"
+          "${inputs.plutarch-numeric}"
+          "${inputs.plutarch-safe-money}"
+          "${inputs.plutarch-quickcheck}"
+          "${inputs.plutarch-context-builder}"
+          # "${inputs.ps-bridge}"
+        ]);
 
       applyDep = pkgs: o:
         let
           h = myhackage pkgs.system o.compiler-nix-name;
           o' = (plutarch.applyPlutarchDep pkgs o);
-        in
-        o' // rec {
+        in o' // rec {
           modules = haskellModules ++ [ h.module ] ++ (o'.modules or [ ]);
           extra-hackages = [ (import h.hackageNix) ]
-          ++ (o'.extra-hackages or [ ]);
+            ++ (o'.extra-hackages or [ ]);
           extra-hackage-tarballs = {
             _xNJUd_plutarch-hackage = h.hackageTarball;
           };
           cabalProjectLocal = (o'.cabalProjectLocal or "")
-          + "  , cache >= 0.1.3.0";
+            + "  , cache >= 0.1.3.0";
         };
 
       projectForGhc = compiler-nix-name: system:
         let pkgs = pkgsFor system;
-        in
-        let pkgs' = pkgsFor' system;
-        in
-        let
+        in let pkgs' = pkgsFor' system;
+        in let
           pkgSet = pkgs.haskell-nix.cabalProject' (applyDep pkgs {
             src = ./.;
             inherit compiler-nix-name;
@@ -196,23 +190,20 @@
               ];
             };
           });
-        in
-        pkgSet;
+        in pkgSet;
 
       projectFor = projectForGhc defaultGhcVersion;
 
       formatCheckFor = system:
         let pkgs' = pkgsFor' system;
-        in
-        pkgs'.runCommand "format-check"
-          {
-            nativeBuildInputs = [
-              pkgs'.haskellPackages.cabal-fmt
-              pkgs'.nixpkgs-fmt
-              (fourmoluFor system)
-              pkgs'.hlint
-            ];
-          } ''
+        in pkgs'.runCommand "format-check" {
+          nativeBuildInputs = [
+            pkgs'.haskellPackages.cabal-fmt
+            pkgs'.nixpkgs-fmt
+            (fourmoluFor system)
+            pkgs'.hlint
+          ];
+        } ''
           export LC_CTYPE=C.UTF-8
           export LC_ALL=C.UTF-8
           export LANG=C.UTF-8
@@ -222,8 +213,7 @@
           mkdir $out
         '';
 
-    in
-    {
+    in {
       project = perSystem projectFor;
       flake = perSystem (system: (projectFor system).flake { });
 
@@ -232,10 +222,9 @@
       # Define what we want to test
       checks = perSystem (system: self.flake.${system}.checks // { });
       check = perSystem (system:
-        (pkgsFor system).runCommand "combined-test"
-          {
-            checksss = builtins.attrValues self.checks.${system};
-          } ''
+        (pkgsFor system).runCommand "combined-test" {
+          checksss = builtins.attrValues self.checks.${system};
+        } ''
           echo $checksss
           touch $out
         '');
