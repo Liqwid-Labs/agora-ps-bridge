@@ -1,5 +1,5 @@
 {
-  description = "agora";
+  description = "agora-ps-bridge";
 
   inputs.nixpkgs.follows = "plutarch/nixpkgs";
   inputs.haskell-nix.follows = "plutarch/haskell-nix";
@@ -225,7 +225,7 @@
         self.flake.${system}.packages // {
           haddock =
             let
-              agora-doc = self.flake.${system}.packages."agora:lib:agora".doc;
+              agora-doc = self.flake.${system}.packages."agora-ps-bridge:lib:agora".doc;
               pkgs = pkgsFor system;
             in
             pkgs.runCommand "haddock-merge" { } ''
@@ -240,9 +240,9 @@
         self.flake.${system}.checks // {
           formatCheck = formatCheckFor system;
           # benchCheck = benchCheckFor system self.flake.${system}.packages."agora:bench:agora-bench";
-          agora = self.flake.${system}.packages."agora:lib:agora";
-          agora-test = self.flake.${system}.packages."agora:test:agora-test";
-          benchCheck = benchCheckFor system self.flake.${system}.packages."agora:bench:agora-bench";
+          agora = self.flake.${system}.packages."agora-ps-bridge:lib:agora";
+          agora-test = self.flake.${system}.packages."agora-ps-bridge:test:agora-test";
+          benchCheck = benchCheckFor system self.flake.${system}.packages."agora-ps-bridge:bench:agora-bench";
         });
       check = perSystem (system:
         (pkgsFor system).runCommand "combined-test"

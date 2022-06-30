@@ -1,5 +1,5 @@
 cabal-version:      3.0
-name:               agora
+name:               agora-ps-bridge
 version:            0.1.0
 extra-source-files: CHANGELOG.md
 author:             Emily Martins <emi@haskell.fyi>
@@ -118,7 +118,7 @@ common deps
 
 common test-deps
   build-depends:
-    , agora
+    , agora-ps-bridge
     , cryptonite
     , data-default-class
     , memory
@@ -180,7 +180,7 @@ executable agora-purescript-bridge
     Options
 
   build-depends:
-    , agora
+    , agora-ps-bridge
     , optparse-applicative
     , path
     , purescript-bridge
