@@ -215,23 +215,6 @@ test-suite agora-test
     , agora-specs
     , agora-testlib
 
-benchmark agora-bench
-  import:         lang, deps
-  hs-source-dirs: agora-bench
-  main-is:        Main.hs
-  other-modules:
-    Bench
-    Options
-
-  type:           exitcode-stdio-1.0
-  build-depends:
-    , agora
-    , agora-specs
-    , agora-testlib
-    , cassava
-    , mtl
-    , optparse-applicative
-
 executable agora-scripts
   import:         lang, deps, exe-opts
   main-is:        Main.hs
