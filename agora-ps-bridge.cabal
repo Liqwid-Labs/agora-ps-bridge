@@ -18,10 +18,6 @@ common lang
     -Wmissing-deriving-strategies -Wno-name-shadowing -Wunused-foralls
     -fprint-explicit-foralls -fprint-explicit-kinds
 
-  mixins:
-    base hiding (Prelude),
-    pprelude (PPrelude as Prelude)
-
   default-extensions:
     NoStarIsType
     BangPatterns
@@ -106,7 +102,6 @@ common deps
     , plutus-core
     , plutus-ledger-api
     , plutus-tx
-    , pprelude
     , prettyprinter
     , recursion-schemes
     , serialise
@@ -114,62 +109,8 @@ common deps
     , template-haskell
     , text
 
-  mixins:
-
-common test-deps
-  build-depends:
-    , agora-ps-bridge
-    , cryptonite
-    , data-default-class
-    , memory
-    , mtl
-    , plutarch-context-builder
-    , plutarch-quickcheck
-    , QuickCheck
-    , quickcheck-instances
-    , tasty
-    , tasty-hedgehog
-    , tasty-hunit
-    , tasty-quickcheck
-    , universe
-    , universe-base
-
 common exe-opts
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -O0
-
-library
-  import:          lang, deps
-  exposed-modules:
-    Agora.Aeson.Orphans
-    Agora.AuthorityToken
-    Agora.Effect
-    Agora.Effect.GovernorMutation
-    Agora.Effect.NoOp
-    Agora.Effect.TreasuryWithdrawal
-    Agora.Governor
-    Agora.Governor.Scripts
-    Agora.MultiSig
-    Agora.Plutarch.Orphans
-    Agora.Proposal
-    Agora.Proposal.Scripts
-    Agora.Proposal.Time
-    Agora.SafeMoney
-    Agora.ScriptInfo
-    Agora.Stake
-    Agora.Stake.Scripts
-    Agora.Treasury
-    Agora.Utils
-
-  other-modules:
-  hs-source-dirs:  agora
-
-library pprelude
-  default-language: Haskell2010
-  exposed-modules:  PPrelude
-  hs-source-dirs:   agora
-  build-depends:
-    , base
-    , plutarch
 
 executable agora-purescript-bridge
   import:         lang, deps, exe-opts
@@ -180,7 +121,7 @@ executable agora-purescript-bridge
     Options
 
   build-depends:
-    , agora-ps-bridge
+    , agora
     , optparse-applicative
     , path
     , purescript-bridge
