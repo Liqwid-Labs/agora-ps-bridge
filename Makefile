@@ -1,7 +1,7 @@
 # This really ought to be `/usr/bin/env bash`, but nix flakes don't like that.
 SHELL := /bin/sh
 
-.PHONY: hoogle format haddock usage tag format_nix format_haskell format_check lint ps_bridge bench bench_check scripts
+.PHONY: hoogle format haddock usage tag format_nix format_haskell format_check lint bridge bench bench_check scripts
 
 AGORA_TARGETS := src
 
@@ -17,7 +17,7 @@ usage:
 	@echo "  format_nix -- Format *.nix files only"
 	@echo "  format_check -- Check if all haskell stuff have been formatted correctly"
 	@echo "  lint -- Get hlint suggestions for project"
-	@echo "  ps_bridge -- Generate purescript bridge files"
+	@echo "  bridge -- Generate purescript bridge files"
 	@echo "  bench -- Generate bench report bench.csv"
 	@echo "  bench_check -- Check if bench report is up-to-date"
 	@echo "  scripts -- Run the agora script server (dev mode)"
@@ -55,7 +55,7 @@ lint:
 
 PS_BRIDGE_OUTPUT_DIR := out/
 
-ps_bridge:
+bridge:
 	cabal run exe:ps-bridge -- -o $(PS_BRIDGE_OUTPUT_DIR)
 
 bench:
