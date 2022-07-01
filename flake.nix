@@ -35,7 +35,9 @@
   outputs = inputs@{ self, nixpkgs, flake-utils, nixpkgs-latest, haskell-nix
     , plutarch, ... }:
     let
-      perSystem = flake-utils.lib.eachSystem [ "x86_64-linux" ];
+      supportedSystems = nixpkgs-latest.lib.systems.flakeExposed;
+
+      perSystem = nixpkgs.lib.genAttrs supportedSystems;
 
       pkgsFor = system:
         import nixpkgs {
@@ -147,7 +149,7 @@
           "${inputs.plutarch-safe-money}"
           "${inputs.plutarch-quickcheck}"
           "${inputs.plutarch-context-builder}"
-          # "${inputs.ps-bridge}"
+          "${inputs.ps-bridge}"
         ]);
 
       applyDep = pkgs: o:
