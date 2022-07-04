@@ -24,7 +24,7 @@
     "github:Liqwid-Labs/plutarch-safe-money?rev=9f968b80189c7e4b335527cd5b103dc26952f667";
   inputs.agora.url =
     "github:Liqwid-Labs/agora?rev=1533da68ecff75f2ee2fd68d023d269c17997fb2";
-  inputs.purescript-bridge.url = "github:mlabs-haskell/purescript-bridge?rev=2e773c860c546b58fe814f720e63d534a4d1d6af";
+  # inputs.purescript-bridge.url = "github:mlabs-haskell/purescript-bridge?rev=2e773c860c546b58fe814f720e63d534a4d1d6af";
 
   # Testing
   inputs.plutarch-quickcheck.url =
