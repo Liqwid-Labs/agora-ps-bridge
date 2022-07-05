@@ -150,6 +150,7 @@
           "${inputs.plutarch-safe-money}"
           "${inputs.plutarch-quickcheck}"
           "${inputs.plutarch-context-builder}"
+          "${inputs.purescript-bridge}"
         ]);
 
       applyDep = pkgs: o:
